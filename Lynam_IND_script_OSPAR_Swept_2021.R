@@ -40,6 +40,7 @@ neg<-function(x) -x
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #location of the data and subscripts
 MAINDIR<- "C:/Users/JR13/Desktop/Fish_dataproduct_QSR/SweptArea_29Oct2021/"
+RDIR<- "C:/Users/JR13/Desktop/Fish_dataproduct_QSR/SweptArea_29Oct2021/R/"
 #FLEX<-T  #?use ICES swept areas
 
 # sampling data and biological data 
@@ -114,6 +115,7 @@ setwd(SUBSCRIPTS_TRAITS)
 PRODDAT<-read.csv("SpeciesAtLength_Productivity.csv")
 FC1Sp<-read.csv("FC1Specieslist.csv")# for IA2017
 #additional functions
+setwd(RDIR)
 source("required.funcs.r")              # using tapply.ID
 source("Lynam_INDfn_Oct2021_guild.r") #Feb2019 now use QUAD to average biomass prior to indicators # Dec2017 update to include TAXA_GROUPINGS, Jan to calc Loo and Lm through Lynam_INDfn_Jan2018_Mtrait.r; Mar to include BX020_guilds
 if(BOOTSTRAP) source("Lynam_IND_BOOTfn_Aug_2017 - OSPAR.r")  # bootstrap the hauls by STSQ and subdiv
@@ -176,7 +178,7 @@ if(CATCHABILITY_COR_MOD | SPECIES_IN_MOD_ONLY) source("Lynam_IND_script_CATCHABI
 #"CSBBFraOT4" "CSEngBT3"    "CSIreOT4"    "CSNIrOT1"  "CSNIrOT4"    "CSScoOT1"    "CSScoOT4"    
 #"GNSEngBT3"   "GNSFraOT4"  "GNSGerBT3"   "GNSIntOT1"   "GNSIntOT3"  "GNSNetBT3"   
 #"WAScoOT3"     "CSFraOT4"
-SURVEY_LOOP <- c("SP-PORC","SP-NORTH","SP-ARSA","PT-IBTS","IE-IGFS","NIGFS","SCOWCGFS","SWC_IBTS","SCORROC","FR-CGFS","BTS-VIII","EVHOE","BTS")
+SURVEY_LOOP <- c("IBTS","SP-PORC","SP-NORTH","SP-ARSA","PT-IBTS","IE-IGFS","NIGFS","SCOWCGFS","SWC_IBTS","SCORROC","FR-CGFS","BTS-VIII","EVHOE","BTS")
 setwd(MAINDIR)
 for(QUARTER in QUARTER_LOOP){ 
 for(COUNTRY in COUNTRY_LOOP){
