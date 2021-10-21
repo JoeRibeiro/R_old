@@ -10,6 +10,7 @@
 # calc average densities across quadrants - to do: hauls in a 60km radius of quadrant mid-points 
 # May 2020 use exchange data once again
 # OCT 2021 - new HH output from SWEPT AREA ASSESSMENT OUTPUT [KLAAS] to combine with HL data from exchange
+#
 
 #useful packages
 library(tidyverse)
