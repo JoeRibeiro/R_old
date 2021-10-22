@@ -45,7 +45,7 @@ RDIR<- "C:/Users/JR13/Desktop/Fish_dataproduct_QSR/SweptArea_29Oct2021/R/"
 
 # sampling data and biological data 
 QUARTER_LOOP <- 3#c(1,3) 
-COUNTRY_LOOP <- "Int"; #important for BTS where data for seperate surveys combined in downloads
+COUNTRY_LOOP <-"Int"# c("Int","GB","NL","GE","BE");
 SEA_LOOP <- "GNS"#CS#  #important for EVHOE as split across OSPAR assessment regions and for BTS where data for seperate surveys combined in downloads
 
 SPPFILE<-paste(MAINDIR,"R/SpeciesInfoSG.csv",sep="")
@@ -56,7 +56,7 @@ LWFILE<-paste(MAINDIR,"R/TakFungLW - plusHakan2020.csv",sep="") #update!!! to in
 
 #location of the subscripts
  PROC_SCRIPT<- "//lowfilecds/function/Eco Indicators/DATRASoutput/" #for HH and HL processing scripts incl strata by survey
- SHAPEPATH<-paste(PROC_SCRIPT,"Strata/",sep="") #used in Lynam_OSPARsubdiv.r
+ SHAPEPATH<-paste("Strata/",sep="") #used in Lynam_OSPARsubdiv.r
  SUBSCRIPTS_TRAITS<-paste(PROC_SCRIPT,"MarScot/INDscriptsForV3/",sep="")#max length
 #location of the shapefiles and where is the 'attributes' folder
 #where save output?
@@ -111,9 +111,9 @@ QUADS<-NULL #created by Lynam_OSPARsubdiv_Feb2019.r
 ##NOTE additional choices below for plotting
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #read subscripts and traits
-setwd(SUBSCRIPTS_TRAITS)
-PRODDAT<-read.csv("SpeciesAtLength_Productivity.csv")
-FC1Sp<-read.csv("FC1Specieslist.csv")# for IA2017
+#setwd(SUBSCRIPTS_TRAITS)
+PRODDAT<-read.csv("R/SpeciesAtLength_Productivity.csv")
+FC1Sp<-read.csv("R/FC1Specieslist.csv")# for IA2017
 #additional functions
 setwd(RDIR)
 source("required.funcs.r")              # using tapply.ID
@@ -166,7 +166,7 @@ if(MEANTLs==T){
 }
 
 # general species groups # Jan 2018 added 2 stingray Dasyatis spp to lookup and Cetorhinus maximus	Basking shark and Alopias vulpinus to SciName2GroupEff to stop error
- SciName2GroupEff <- read.csv(paste(SUBSCRIPTS_TRAITS,"SciName2GroupEff_Jan2018.csv",sep=""))
+ SciName2GroupEff <- read.csv("SciName2GroupEff_Jan2018.csv")
  SciName2GroupEff$Group <- paste("GRP",SciName2GroupEff$Group, sep="")
  SciName2GroupEff$sciName<-as.character(SciName2GroupEff$sciName)
  substr(SciName2GroupEff$sciName,1,1) <- toupper(substr(SciName2GroupEff$sciName,1,1))#correct case
@@ -178,12 +178,14 @@ if(CATCHABILITY_COR_MOD | SPECIES_IN_MOD_ONLY) source("Lynam_IND_script_CATCHABI
 #"CSBBFraOT4" "CSEngBT3"    "CSIreOT4"    "CSNIrOT1"  "CSNIrOT4"    "CSScoOT1"    "CSScoOT4"    
 #"GNSEngBT3"   "GNSFraOT4"  "GNSGerBT3"   "GNSIntOT1"   "GNSIntOT3"  "GNSNetBT3"   
 #"WAScoOT3"     "CSFraOT4"
-SURVEY_LOOP <- c("IBTS","SP-PORC","SP-NORTH","SP-ARSA","PT-IBTS","IE-IGFS","NIGFS","SCOWCGFS","SWC_IBTS","SCORROC","FR-CGFS","BTS-VIII","EVHOE","BTS")
+SURVEY_LOOP <- c("IBTS","SP-PORC","SP-NORTH","SP-ARSA","SCOROC","FR-CGFS","PT-IBTS","IE-IGFS","NIGFS","SCOWCGFS","SWC_IBTS","BTS-VIII","EVHOE","BTS")
 setwd(MAINDIR)
 for(QUARTER in QUARTER_LOOP){ 
 for(COUNTRY in COUNTRY_LOOP){
 for(SEA in SEA_LOOP){
   for(survey in SURVEY_LOOP){ #need survey last so that once overwritten below resets for next Quarter/Country/Sea
+    if(survey!="BTS" & COUNTRY!=COUNTRY_LOOP[1]) next
+    if(survey=="BTS" & COUNTRY=="Int") next
   # survey <-"IBTS"; QUARTER<-1; COUNTRY<-"Int"; SEA<-"GNS"
   print(paste(survey," Q",QUARTER,sep=""))
     #rename to OSPAR survey names:
@@ -215,7 +217,7 @@ for(SEA in SEA_LOOP){
     if(survey=="SCOWCGFS" & QUARTER==4){  survey<-"CSScoOT4"} #from 2010
     if(survey=="SWC_IBTS" & QUARTER==1){  survey<-"CSScoOT1"} #until 2010
     if(survey=="SWC_IBTS" & QUARTER==4){  survey<-"CSScoOT4"} #until 2010
-    if(survey=="SCORROC" & QUARTER==3){  survey<-"WAScoOT3"}  #from 2011 ROCKALL previous years
+    if(survey=="SCOROC" & QUARTER==3){  survey<-"WAScoOT3"}  #from 2011 ROCKALL previous years
     
     
     if(survey=="FR-CGFS" & QUARTER==1){  survey<-"GNSFraOT4"}
@@ -397,6 +399,8 @@ for(SEA in SEA_LOOP){
   with(samp, hist(MonthShot))
   with(samp, hist(HaulDur_min))
   with(samp, hist(Depth_m))
+
+  if(substr(survey,7,8)!="BT"){
   with(samp, hist(WingSpread_m))
   with(samp, hist(DoorSpread_m))
   with(samp, hist(NetOpen_m))
@@ -404,6 +408,9 @@ for(SEA in SEA_LOOP){
   with(samp, hist(WingSwpVol_CorF ))
   with(samp, hist(DoorSwptArea_CorF) )
   with(samp, hist(DoorSwptVol_CorF))
+  }
+  
+  
   with(samp, hist(Distance_km))
   #samp[(samp$Distance_km)==max(samp$Distance_km),]
   #samp[(samp$Distance_km)>5,] # big value
@@ -490,6 +497,7 @@ for(SEA in SEA_LOOP){
   ##### strata ##### 
   print("now add strata")
   #source("//lowfilecds/Function/Eco Indicators/DATRASoutput/MarScot/INDscriptsForV3/Lynam_OSPARsubdiv_Feb2019.r")
+  dhspporig=dhspp
   source(paste(MAINDIR,"R/Lynam_OSPARsubdiv_Feb2019.r",sep=""))
   
   #replace sampstrat with  quadrants if QUAD==T
