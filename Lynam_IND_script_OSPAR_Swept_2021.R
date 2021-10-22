@@ -360,14 +360,15 @@ for(combrow in 1:nrow(survey_Q_C_S_combinations)){
   with(samp, hist(Depth_m))
 
   if(substr(survey,7,8)!="BT"){
-  with(samp, hist(WingSpread_m))
-  with(samp, hist(DoorSpread_m))
-  with(samp, hist(NetOpen_m))
-  with(samp, hist(WingSwpArea_sqkm) )
-  with(samp, hist(WingSwpVol_CorF ))
-  with(samp, hist(DoorSwptArea_CorF) )
-  with(samp, hist(DoorSwptVol_CorF))
-  }
+    if(substr(survey,6,7)!="BT"){
+      with(samp, hist(WingSpread_m))
+      with(samp, hist(DoorSpread_m))
+      with(samp, hist(NetOpen_m))
+      with(samp, hist(WingSwpArea_sqkm) )
+      with(samp, hist(WingSwpVol_CorF ))
+      with(samp, hist(DoorSwptArea_CorF) )
+      with(samp, hist(DoorSwptVol_CorF))
+  }}
   
   
   with(samp, hist(Distance_km))
@@ -406,6 +407,10 @@ for(combrow in 1:nrow(survey_Q_C_S_combinations)){
   #samp$WingSwpVol_CorF <- ave_NetOpen_m / samp$NetOpen_m # scale down if larger than usual net opening
   #"SubFactor",  
   dhspp <- merge(bio,samp,by="HaulID")
+  
+  # JR edit - dhspp contains NA lats and longs
+  dhspp = dhspp[is.finite(dhspp$ShootLat_degdec) & is.finite(dhspp$ShootLong_degdec),]
+  
   with(dhspp, xyplot(ShootLat_degdec~ShootLong_degdec | ac(YearShot) ))
   lostID<-unique(bio[!(bio$HaulID %in% dhspp$HaulID),"HaulID"])#all matched with StnNo
   if(length(lostID) >0){print(paste("losing", length(lostID) ,"hauls from",length(unique(bio$HaulID)),"when merge bio and samp")) } else { print("successful merge HL and HH to create dhspp")}
