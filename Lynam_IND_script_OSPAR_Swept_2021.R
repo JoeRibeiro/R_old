@@ -44,7 +44,7 @@ RDIR<- "C:/Users/JR13/Desktop/Fish_dataproduct_QSR/SweptArea_29Oct2021/R/"
 #FLEX<-T  #?use ICES swept areas
 
 # sampling data and biological data 
-QUARTER_LOOP <- 3#c(1,3) 
+QUARTER_LOOP <- c(1,2,3,4) 
 COUNTRY_LOOP <-"Int"# c("Int","GB","NL","GE","BE");
 SEA_LOOP <- "GNS"#CS#  #important for EVHOE as split across OSPAR assessment regions and for BTS where data for seperate surveys combined in downloads
 
@@ -116,6 +116,7 @@ PRODDAT<-read.csv("R/SpeciesAtLength_Productivity.csv")
 FC1Sp<-read.csv("R/FC1Specieslist.csv")# for IA2017
 #additional functions
 setwd(RDIR)
+survey_Q_C_S_combinations<-read.csv("survey_Q_C_S_combinations.csv", fileEncoding = 'UTF-8-BOM')# for IA2017
 source("required.funcs.r")              # using tapply.ID
 source("Lynam_INDfn_Oct2021_guild.r") #Feb2019 now use QUAD to average biomass prior to indicators # Dec2017 update to include TAXA_GROUPINGS, Jan to calc Loo and Lm through Lynam_INDfn_Jan2018_Mtrait.r; Mar to include BX020_guilds
 if(BOOTSTRAP) source("Lynam_IND_BOOTfn_Aug_2017 - OSPAR.r")  # bootstrap the hauls by STSQ and subdiv
@@ -178,12 +179,16 @@ if(CATCHABILITY_COR_MOD | SPECIES_IN_MOD_ONLY) source("Lynam_IND_script_CATCHABI
 #"CSBBFraOT4" "CSEngBT3"    "CSIreOT4"    "CSNIrOT1"  "CSNIrOT4"    "CSScoOT1"    "CSScoOT4"    
 #"GNSEngBT3"   "GNSFraOT4"  "GNSGerBT3"   "GNSIntOT1"   "GNSIntOT3"  "GNSNetBT3"   
 #"WAScoOT3"     "CSFraOT4"
-SURVEY_LOOP <- c("IBTS","SP-PORC","SP-NORTH","SP-ARSA","SCOROC","FR-CGFS","PT-IBTS","IE-IGFS","NIGFS","SCOWCGFS","SWC_IBTS","BTS-VIII","EVHOE","BTS")
+SURVEY_LOOP <- c("IBTS")#,"SP-NORTH","SP-ARSA","SCOROC","FR-CGFS","SP-PORC","PT-IBTS","IE-IGFS","NIGFS","SCOWCGFS","SWC_IBTS","BTS-VIII","EVHOE","BTS")
 setwd(MAINDIR)
-for(QUARTER in QUARTER_LOOP){ 
-for(COUNTRY in COUNTRY_LOOP){
-for(SEA in SEA_LOOP){
-  for(survey in SURVEY_LOOP){ #need survey last so that once overwritten below resets for next Quarter/Country/Sea
+for(combrow in nrow(survey_Q_C_S_combinations)){
+combs=survey_Q_C_S_combinations[combrow,]
+QUARTER=combs$Quarter
+COUNTRY=combs$Country
+SEA=combs$Sea
+survey=combs$Surveynam1
+survey_alt_name=combs$Surveynam2
+ #need survey last so that once overwritten below resets for next Quarter/Country/Sea
     if(survey!="BTS" & COUNTRY!=COUNTRY_LOOP[1]) next
     if(survey=="BTS" & COUNTRY=="Int") next
   # survey <-"IBTS"; QUARTER<-1; COUNTRY<-"Int"; SEA<-"GNS"
@@ -201,8 +206,19 @@ for(SEA in SEA_LOOP){
       SSA <- read.csv(paste(MAINDIR,"R/IBTS_SSA.csv",sep=""))
     }  
     
-    if(survey=="SP-PORC" & QUARTER==3){  survey<-"WASpaOT3"}
-    if(survey=="SP-NORTH" & QUARTER==4){  survey<-"BBICnSpaOT4"} 
+    if(survey=="SP-PORC"  & QUARTER==3){  survey<-"WASpaOT3"
+      SAMP_FILE   <- paste(MAINDIR,"HH/HH-SP-PORC.csv",sep="")  
+      BIOL_FILE   <- paste(MAINDIR,"HL/HL-SP-PORC.csv",sep="")
+      SSA <- NA
+    }
+    
+
+    if(survey=="SP-NORTH"  & QUARTER==4){  survey<-"BBICnSpaOT4" #
+      SAMP_FILE   <- paste(MAINDIR,"HH/HH-SP-NORTH.csv",sep="")  
+      BIOL_FILE   <- paste(MAINDIR,"HL/HL-SP-NORTH.csv",sep="")
+      SSA <- NA
+    } 
+    
     if(survey=="SP-ARSA" & QUARTER==1){  survey<-"BBICsSpaOT1"} 
     if(survey=="SP-ARSA" & QUARTER==4){  survey<-"BBICsSpaOT4"}  
     
@@ -316,8 +332,8 @@ for(SEA in SEA_LOOP){
   names(samp)[which(names(samp) == "DepthStratum")] <- "SurvStratum"
 
   #samp<-  merge(samp,flex,by="HaulID", all.x=F,all.y=F)
-  with(samp[samp$ShootLong_degdec>7,], xyplot(ShootLat_degdec~ShootLong_degdec | ac(YearShot) ))
-  with(samp, xyplot(ShootLat_degdec~ShootLong_degdec | ac(YearShot) ))
+  #with(samp[samp$ShootLong_degdec>7,], xyplot(ShootLat_degdec~ShootLong_degdec | ac(YearShot) ))
+  #with(samp, xyplot(ShootLat_degdec~ShootLong_degdec | ac(YearShot) ))
   # biological data
   bio <- read.csv(BIOL_FILE,as.is = c(1,2,4,5,6,10,11) )  #avoid conversions of rect to e+07 etc #,as.is=1 ) #
   
@@ -638,8 +654,6 @@ for(SEA in SEA_LOOP){
   print(paste("Finished",survey, "survey",sep=" "))
   dev.off()
   }
-  }
-  }#QUARTER # COUNTRY # SEA loops
-} # next survey
+
 print("script complete")
   
