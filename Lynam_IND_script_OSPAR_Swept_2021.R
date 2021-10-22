@@ -175,80 +175,23 @@ if(MEANTLs==T){
 if(CATCHABILITY_COR_MOD | SPECIES_IN_MOD_ONLY) source("Lynam_IND_script_CATCHABILITY_MODEL.R")
   
 
-#### indicators survey loop ####"WASpaOT3" "BBICnSpaOT4" "BBICPorOT4"  "BBICsSpaOT1" "BBICsSpaOT4" 
-#"CSBBFraOT4" "CSEngBT3"    "CSIreOT4"    "CSNIrOT1"  "CSNIrOT4"    "CSScoOT1"    "CSScoOT4"    
-#"GNSEngBT3"   "GNSFraOT4"  "GNSGerBT3"   "GNSIntOT1"   "GNSIntOT3"  "GNSNetBT3"   
-#"WAScoOT3"     "CSFraOT4"
-SURVEY_LOOP <- c("IBTS")#,"SP-NORTH","SP-ARSA","SCOROC","FR-CGFS","SP-PORC","PT-IBTS","IE-IGFS","NIGFS","SCOWCGFS","SWC_IBTS","BTS-VIII","EVHOE","BTS")
+#### indicators survey loop ####
+ 
 setwd(MAINDIR)
-for(combrow in nrow(survey_Q_C_S_combinations)){
-combs=survey_Q_C_S_combinations[combrow,]
-QUARTER=combs$Quarter
-COUNTRY=combs$Country
-SEA=combs$Sea
-survey=combs$Surveynam1
-survey_alt_name=combs$Surveynam2
- #need survey last so that once overwritten below resets for next Quarter/Country/Sea
-    if(survey!="BTS" & COUNTRY!=COUNTRY_LOOP[1]) next
-    if(survey=="BTS" & COUNTRY=="Int") next
-  # survey <-"IBTS"; QUARTER<-1; COUNTRY<-"Int"; SEA<-"GNS"
+for(combrow in 1:nrow(survey_Q_C_S_combinations)){
+  combs=survey_Q_C_S_combinations[combrow,]
+  QUARTER=combs$Quarter
+  COUNTRY=combs$Country
+  SEA=combs$Sea
+  SSA=combs$SSAfilename
+  survey=combs$Surveynam1
+  survey_alt_name=combs$Surveynam2
+  SAMP_FILE=paste0("HH//",combs$hhfilename)
+  BIOL_FILE=paste0("HL//",combs$hlfilename)
+  #need survey last so that once overwritten below resets for next Quarter/Country/Sea
   print(paste(survey," Q",QUARTER,sep=""))
     #rename to OSPAR survey names:
-    if(survey=="IBTS" & QUARTER==1){ survey<-"GNSIntOT1"
-      SAMP_FILE   <- paste(MAINDIR,"HH/HH-NS-IBTS.csv",sep="")  
-      BIOL_FILE   <- paste(MAINDIR,"HL/HL-NS-IBTS.csv",sep="")
-      SSA <- read.csv(paste(MAINDIR,"R/IBTS_SSA.csv",sep="")) # to reduce output for standard survey area as in IA2017 
-      #SSA is not currently implemented and datafiles are required for other surveys beyond GNSIntOT1 and GNSIntOT3
-      }   
-    if(survey=="IBTS" & QUARTER==3){ survey<-"GNSIntOT3"
-      SAMP_FILE   <- paste(MAINDIR,"HH/HH-NS-IBTS.csv",sep="")  
-      BIOL_FILE   <- paste(MAINDIR,"HL/HL-NS-IBTS.csv",sep="")
-      SSA <- read.csv(paste(MAINDIR,"R/IBTS_SSA.csv",sep=""))
-    }  
-    
-    if(survey=="SP-PORC"  & QUARTER==3){  survey<-"WASpaOT3"
-      SAMP_FILE   <- paste(MAINDIR,"HH/HH-SP-PORC.csv",sep="")  
-      BIOL_FILE   <- paste(MAINDIR,"HL/HL-SP-PORC.csv",sep="")
-      SSA <- NA
-    }
-    
 
-    if(survey=="SP-NORTH"  & QUARTER==4){  survey<-"BBICnSpaOT4" #
-      SAMP_FILE   <- paste(MAINDIR,"HH/HH-SP-NORTH.csv",sep="")  
-      BIOL_FILE   <- paste(MAINDIR,"HL/HL-SP-NORTH.csv",sep="")
-      SSA <- NA
-    } 
-    
-    if(survey=="SP-ARSA" & QUARTER==1){  survey<-"BBICsSpaOT1"} 
-    if(survey=="SP-ARSA" & QUARTER==4){  survey<-"BBICsSpaOT4"}  
-    
-    if(survey=="PT-IBTS" & QUARTER==4){  survey<-"BBICPorOT4"}  
-   
-    if(survey=="IE-IGFS" & QUARTER==4){  survey<-"CSIreOT4"}    
-    
-    if(survey=="NIGFS	" & QUARTER==1){  survey<-"CSNIrOT1"}  
-    if(survey=="NIGFS	" & QUARTER==4){  survey<-"CSNIrOT4"}    
-    
-    if(survey=="SCOWCGFS" & QUARTER==1){  survey<-"CSScoOT1"} #from 2010
-    if(survey=="SCOWCGFS" & QUARTER==4){  survey<-"CSScoOT4"} #from 2010
-    if(survey=="SWC_IBTS" & QUARTER==1){  survey<-"CSScoOT1"} #until 2010
-    if(survey=="SWC_IBTS" & QUARTER==4){  survey<-"CSScoOT4"} #until 2010
-    if(survey=="SCOROC" & QUARTER==3){  survey<-"WAScoOT3"}  #from 2011 ROCKALL previous years
-    
-    
-    if(survey=="FR-CGFS" & QUARTER==1){  survey<-"GNSFraOT4"}
-    if(survey=="BTS-VIII" & QUARTER==3){  survey<-"CSFraBT3"}   
-    if(survey=="EVHOE" & SEA=="CS" & QUARTER==4){  survey<-"CSFraOT4"}
-    if(survey=="EVHOE" & SEA!="CS" & QUARTER==4){  survey<-"CSBBFraOT4"} # this is split from above for OSPAR assessment - need to edit
-    
-    if(survey=="BTS" & SEA=="GNS"& COUNTRY=="Eng" & QUARTER==3){  survey<-"GNSEngBT3"}#north sea
-    if(survey=="BTS" & SEA=="CS" & COUNTRY=="Eng" & QUARTER==3){  survey<-"CSEngBT3"}   
-    if(survey=="BTS" & SEA=="CS" & COUNTRY=="Eng" & QUARTER==4){  survey<-"CSEngBT4"}   #new Eng data not in IA2017 for Celtic sea beam trawl for SW  
-    if(survey=="BTS" & COUNTRY=="Ger" & QUARTER==3){  survey<-"GNSGerBT3" }  
-    if(survey=="BTS" & COUNTRY=="Net" & QUARTER==3){  survey<-"GNSNetBT3" }  
-    if(survey=="BTS" & COUNTRY=="Bel" & QUARTER==3){  survey<-"GNSBelBT3" }#new data not in IA2017 as not previously in DATRAS
-  print(survey) #new OSPAR name as in Mar Scot dataproduct
-  
   #add a directory for files out
   if(!file.exists(paste(OUTPATHstem,survey,sep=''))) dir.create(file.path(OUTPATHstem, survey))
   OUTPATH <- paste(OUTPATHstem,survey,"/",sep='')

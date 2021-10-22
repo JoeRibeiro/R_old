@@ -23,6 +23,7 @@ if(LFI){
     if(SPECIES[plotgroups]=="ALL"){ DATA2PLOT <- IND_OUT[["LFI_by_sub_all"]][,"LFIregional"]; YLIM<- c(0,0.05);  BOOTDATA2PLOT <- LFI_regional$all;if(TITAdd){ TITLE<-"All fish"}  }
     if(SPECIES[plotgroups]=="PEL"){ plot(1,1,col="white",axes=F,ylab=""); next; DATA2PLOT <- IND_OUT[["LFI_by_sub_pel"]][,"LFIregional"]; YLIM<- c(0,0.05);  BOOTDATA2PLOT <- LFI_regional$pel;if(TITAdd){ TITLE<-"Pelagic fish"}  }
     if(SPECIES[plotgroups]=="DEM"){ DATA2PLOT <- IND_OUT[["LFI_by_sub_dem"]][,"LFIregional"]; YLIM<- c(0.1,0.45);BOOTDATA2PLOT <- LFI_regional$dem;if(TITAdd){ TITLE<-"Demersal fish"} }
+    print(DATA2PLOT)
     if(!is.null(DATA2PLOT)){
       summary(lmseaLFI<-gam(DATA2PLOT ~ (YRS))); GAMMOD<-predict(lmseaLFI,se=T) 
       if(ADDGAM){ summary(gseaLFI<-gam(DATA2PLOT ~ s(YRS,k=6))); GAMMOD<-predict(gseaLFI,se=T) }
